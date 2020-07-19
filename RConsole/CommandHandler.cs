@@ -126,13 +126,15 @@ namespace RConsole
 
                             if (attr is CommandAttribute)
                             {
-                                
-                                string name = ((CommandAttribute)attr).Name;
-                                
-                                // Deals with duplicates of attributes. I still haven't figured out what is causing it.
-                                if (!commands.ContainsKey(name))
+                                if (!((CommandAttribute)attr).Hide)
                                 {
-                                    commands.Add(name, new Command(name, info, ((CommandAttribute)attr).IsInstance));
+                                    string name = ((CommandAttribute)attr).Name;
+
+                                    // Deals with duplicates of attributes. I still haven't figured out what is causing it.
+                                    if (!commands.ContainsKey(name))
+                                    {
+                                        commands.Add(name, new Command(name, info, ((CommandAttribute)attr).IsInstance));
+                                    }
                                 }
                             }
                     }

@@ -22,6 +22,7 @@ namespace RConsole.Plugins
 
             switch (args[0])
             {
+                
                 case "toggle":
                     
                     if(argCount > 1 && args[1] == "help")
@@ -61,6 +62,11 @@ namespace RConsole.Plugins
         private static void ToggleMusic()
         {
             keybd_event(PLAY_PAUSE, 0, 1, IntPtr.Zero);
+        }
+
+        private static void StopMusic()
+        {
+            keybd_event(0xB2, 0, 1, IntPtr.Zero);
         }
 
         private static void NextTrack()

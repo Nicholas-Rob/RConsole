@@ -20,6 +20,7 @@ namespace RConsole
 
         // Logic for this is found in CommandHandler.Handle()
         public bool IsInstance;
+        public bool Hide;
         public CommandAttribute(string name)
         {
             Name = name;           
