@@ -9,6 +9,7 @@ namespace RConsole
     public class CommandBase
     {
         public static List<object> bases;
+        
         public CommandBase()
         {
             if (bases != null && !bases.Contains(this))
@@ -20,6 +21,7 @@ namespace RConsole
         public static void InitCommandBaseList()
         {
             bases = new List<object>();
+            
         }
 
         

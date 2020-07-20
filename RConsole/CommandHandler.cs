@@ -11,6 +11,8 @@ namespace RConsole
     {
         
         private static Dictionary<string, Command> commands = new Dictionary<string, Command>();
+        private static List<MethodInfo> OnLoadList = new List<MethodInfo>();
+        private static List<MethodInfo> OnUnloadList = new List<MethodInfo>();
 
         public CommandHandler()
         {
@@ -22,6 +24,14 @@ namespace RConsole
 
             // Finally, register all commands from CommandBase classes by creating Command objects using their data.
             RegisterCommands();
+
+            ExecuteOnLoadFunctions();
+        }
+
+        public static void Exit()
+        {
+            ExecuteOnUnloadFunctions();
+            RConsoleBase.Running = false;
         }
 
         // Handles command inputs and makes sure everything gets handled properly.
@@ -123,8 +133,15 @@ namespace RConsole
                         Attribute[] attrs = Attribute.GetCustomAttributes(info);
 
                         foreach (Attribute attr in attrs)
-
-                            if (attr is CommandAttribute)
+                        {
+                            if (attr is OnLoadAttribute)
+                            {
+                                OnLoadList.Add(info);
+                            }else if(attr is OnUnloadAttribute)
+                            {
+                                OnUnloadList.Add(info);
+                            }
+                            else if (attr is CommandAttribute)
                             {
                                 if (!((CommandAttribute)attr).Hide)
                                 {
@@ -137,6 +154,7 @@ namespace RConsole
                                     }
                                 }
                             }
+                        }
                     }
                 }
             }
@@ -169,6 +187,22 @@ namespace RConsole
             return null;
         }
 
+        private static void ExecuteOnLoadFunctions()
+        {
+            foreach(MethodInfo func in OnLoadList)
+            {
+                func.Invoke(null, null);
+            }
+        }
+
+        private static void ExecuteOnUnloadFunctions()
+        {
+            foreach (MethodInfo func in OnUnloadList)
+            {
+                func.Invoke(null, null);
+            }
+        }
+
         // Structure of Command object
         public class Command
         {
@@ -188,8 +222,17 @@ namespace RConsole
             public bool Execute(string[] args)
             {
                 // Invoke MethodInfo using this class as representation, and using a new object array containing the arguments for the invoked function.
-                bool result = (bool) Method.Invoke(this, new object[] { args });
-                return result;
+
+                try
+                {
+                    bool result = (bool)Method.Invoke(this, new object[] { args });
+                    return result;
+                }catch(Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
+                return false;
             }
         }
 

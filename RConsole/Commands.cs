@@ -34,7 +34,8 @@ namespace RConsole
                 return true;
             }
 
-            RConsoleBase.Running = false;
+            CommandHandler.Exit();
+            
             return true;
         }
 
