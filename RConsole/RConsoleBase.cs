@@ -36,6 +36,10 @@ namespace RConsole
             }
         }
 
+        public void TempRun(string[] args)
+        {
+            ExecuteCommand(ArrayToString(args));
+        }
 
         private void ExecuteCommand(string commandLine)
         {
@@ -60,6 +64,18 @@ namespace RConsole
         public static void Clear()
         {
             Console.Clear();
+        }
+
+        private static string ArrayToString(string[] array)
+        {
+            string result = "";
+            foreach (string s in array)
+            {
+                result += s + " ";
+            }
+            return result.Trim();
+
+
         }
     }
 }

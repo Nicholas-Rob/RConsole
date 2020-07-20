@@ -54,7 +54,7 @@ namespace RConsole.Plugins
         {
             if (args[0] == null)
             {
-                ChangeWindowView(6);
+                ChangeWindowView(GetForegroundWindow(), 6);
             }
             else
             {
@@ -75,7 +75,7 @@ namespace RConsole.Plugins
         {
             if (args[0] == null)
             {
-                ChangeWindowView(3);
+                ChangeWindowView(GetForegroundWindow(),3);
             }
             else
             {
@@ -90,6 +90,68 @@ namespace RConsole.Plugins
                 //SetWindowToForeground(handle);
             }
             return true;
+        }
+
+        [Command("red")]
+        public static bool ReduceCommand(string[] args)
+        {
+            if (args[0] == null)
+            {
+                ChangeWindowView(GetForegroundWindow(),1);
+            }
+            else
+            {
+
+                IntPtr handle = GetHandleByDesc(ArrayToString(args));
+
+                if (!ChangeWindowView(handle, 1))
+                {
+                    handle = GetHandleByTitle(ArrayToString(args));
+                    ChangeWindowView(handle, 1);
+                }
+                
+            }
+            return true;
+        }
+
+        [Command("size")]
+        public static bool ResizeCommand(string[] args)
+        {
+            if (args.Length == 2) {
+                ResizeWindowByHandle(GetForegroundWindow(), Convert.ToInt32(args[0]), Convert.ToInt32(args[1]));
+            }else if (args.Length > 2)
+            {
+                IntPtr handle = GetHandleByDesc(ArrayToString(args.Take(args.Length - 2).ToArray()));
+                ResizeWindowByHandle(handle, Convert.ToInt32(args[args.Length-2]), Convert.ToInt32(args[args.Length-1]));
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+
+        [Command("move")]
+        public static bool MoveWindowCommand(string[] args)
+        {
+            if (args.Length == 2)
+            {
+                RepositionWindowByHandle(GetForegroundWindow(), Convert.ToInt32(args[0]), Convert.ToInt32(args[1]));
+            }
+            else if (args.Length > 2)
+            {
+                IntPtr handle = GetHandleByDesc(ArrayToString(args.Take(args.Length - 2).ToArray()));
+                RepositionWindowByHandle(handle, Convert.ToInt32(args[args.Length - 2]), Convert.ToInt32(args[args.Length - 1]));
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
+
         }
 
         [Command("processes")]
@@ -114,24 +176,37 @@ namespace RConsole.Plugins
             return true;
         }
 
-        [Command("move")]
-        public static bool MoveWindowCommand(string[] args)
+        [Command("switch")]
+        public static bool SwitchMonitorCommand(string[] args)
         {
             if (args[0] == null) return false;
 
-            if (args.Length == 1)
+            try
             {
-                MoveForgroundWindow(Convert.ToInt32(args[0]));
-            }
-            else
+                int screen = Convert.ToInt32(args[args.Length - 1]);
+                if (screen > 0 && screen < 3)
+                {
+                    if (args.Length == 1)
+                    {
+
+                        MoveWindowByHandle(GetForegroundWindow(), screen);
+
+                    }
+                    else
+                    {
+
+                        IntPtr handle = GetHandleByDesc(ArrayToString(args.Take(args.Length - 1).ToArray()));
+                        MoveWindowByHandle(handle, Convert.ToInt32(args[args.Length - 1]));
+                        //ChangeWindowView(handle, 3);
+
+
+                    }
+                }
+            }catch(Exception e)
             {
 
-                IntPtr handle = GetHandleByDesc(ArrayToString(args.Take(args.Length - 1).ToArray()));
-                MoveWindowByHandle(handle, Convert.ToInt32(args[args.Length - 1]));
-                //ChangeWindowView(handle, 3);
-
-
             }
+
             return true;
         }
 
@@ -201,15 +276,6 @@ namespace RConsole.Plugins
         [DllImport("user32.dll")]
         public static extern IntPtr TileWindows(IntPtr parent, int wHow, IntPtr rect, int kids, IntPtr lpKids);
 
-
-        private static void ChangeWindowView(int state)
-        {
-            IntPtr handle = GetForegroundWindow();
-
-            ShowWindow(handle, state);
-
-
-        }
 
         private static bool ChangeWindowView(IntPtr handle, int state)
         {
@@ -294,21 +360,7 @@ namespace RConsole.Plugins
         }
 
 
-        private static void CloseProcess(string name)
-        {
-            foreach (Process p in Process.GetProcesses())
-            {
-                if (p.ProcessName.ToLower() == name.ToLower() && p.MainWindowTitle != "")
-                {
-                    p.CloseMainWindow();
-
-                }
-
-            }
-
-
-
-        }
+        
 
         private static void CloseAppWindow(string title)
         {
@@ -348,25 +400,21 @@ namespace RConsole.Plugins
             }
         }
 
-
-        private static void MoveForgroundWindow(int screen)
+        private static void RepositionWindowByHandle(IntPtr handle, int x, int y)
         {
-            IntPtr handle = GetForegroundWindow();
-            ChangeWindowView(handle, 1);
-            SetWindowPos(handle, IntPtr.Zero, 2000 * (screen - 1), 50, 0, 0, 0x0001 | 0x0004);
-            ChangeWindowView(handle, 3);
+            SetWindowPos(handle, IntPtr.Zero, x, y, 0, 0, 0x0001 | 0x0004);
         }
 
-        private static void SetWindowToForeground(IntPtr handle)
+        private static void ResizeWindowByHandle(IntPtr handle, int width, int height)
         {
-            SetForegroundWindow(handle);
+            SetWindowPos(handle, IntPtr.Zero, 0, 0, width, height, 0x0002 | 0x0004);
         }
 
         private static void MoveWindowByHandle(IntPtr handle, int screen)
         {
             ChangeWindowView(handle, 1);
-            SetWindowPos(handle, IntPtr.Zero, 2000 * (screen - 1), 50, 0, 0, 0x0001 | 0x0004);
-            ChangeWindowView(handle, 3);
+            SetWindowPos(handle, IntPtr.Zero, 2000 * (screen - 1), 200, 0, 0, 0x0001 | 0x0004);
+            //ChangeWindowView(handle, 3);
         }
 
         private static void TileWindowsByMainHandle(IntPtr handle)
@@ -375,10 +423,7 @@ namespace RConsole.Plugins
             {
                 TileWindows(IntPtr.Zero, 0x0000, IntPtr.Zero, 2, IntPtr.Zero);
             }
-            /*else
-            {
-                TileWindows(GetForegroundWindow(), 0x0000, IntPtr.Zero, 2, IntPtr.Zero);
-            } */
+            
         }
 
         private static void DisplayProcesses(bool windows)

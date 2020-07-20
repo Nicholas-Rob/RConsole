@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <ApplicationIcon>iconrconsole1_2_91B_icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

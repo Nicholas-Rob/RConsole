@@ -10,7 +10,16 @@ namespace RConsole
         {
             RConsoleBase console = new RConsoleBase();
 
-            console.Run();
+            if (args.Length > 0)
+            {
+                console.TempRun(args);
+            }
+            else
+            {
+                
+
+                console.Run();
+            }
         }
     }
 }
