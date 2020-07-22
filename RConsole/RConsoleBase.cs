@@ -7,7 +7,10 @@ namespace RConsole
     class RConsoleBase
     {
 
-        CommandHandler handler;
+        static RConsoleBase console;
+        static CommandHandler cHandler;
+        static BluetoothManager bManager;
+        
 
         public static bool Running = false;
 
@@ -16,20 +19,26 @@ namespace RConsole
 
         public RConsoleBase()
         {
+            console = this;
 
-            handler = new CommandHandler();
-   
+            cHandler = new CommandHandler();
+
+            bManager = new BluetoothManager(console);
         }
 
         public void Run()
         {
             Running = true;
 
+            bManager.Run();
             // Main console input loop
+
+            Console.WriteLine();
+            Console.Write(instance + "#: ");
+
             while (Running)
             {
-                Console.WriteLine();
-                Console.Write(instance+"#: ");
+                
 
                 ExecuteCommand(Console.ReadLine());
 
@@ -41,9 +50,14 @@ namespace RConsole
             ExecuteCommand(ArrayToString(args));
         }
 
-        private void ExecuteCommand(string commandLine)
+        public void ExecuteCommand(string commandLine)
         {
-            handler.Handle(commandLine.Trim().Split(' '));
+            Console.Write(commandLine);
+
+            cHandler.Handle(commandLine.Trim().Split(' '));
+
+            Console.WriteLine();
+            Console.Write(instance + "#: ");
         }
 
         public static void SetInstance(string instance)
