@@ -30,7 +30,8 @@ namespace RConsole
         {
             Running = true;
 
-            bManager.Run();
+            //bManager.Run();
+
             // Main console input loop
 
             Console.WriteLine();
@@ -52,7 +53,7 @@ namespace RConsole
 
         public void ExecuteCommand(string commandLine)
         {
-            Console.Write(commandLine);
+            //Console.Write(commandLine);
 
             cHandler.Handle(commandLine.Trim().Split(' '));
 
@@ -78,6 +79,11 @@ namespace RConsole
         public static void Clear()
         {
             Console.Clear();
+        }
+
+        public static bool TryBluetooth()
+        {
+           return bManager.Run();
         }
 
         private static string ArrayToString(string[] array)

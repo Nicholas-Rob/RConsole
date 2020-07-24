@@ -10,22 +10,32 @@ namespace RConsole
     class BluetoothManager
     {
         RConsoleBase console;
-        bool Running = true;
+        bool Running = false;
         BluetoothListener listener;
 
+        const string PROX = "music toggle";
 
         public BluetoothManager(RConsoleBase console)
         {
             this.console = console;   
         }
 
-        public void Run()
+        public bool Run()
         {
-            listener = new BluetoothListener(Guid.Parse("2d26618601fb47c28d9f10b8ec891363"));
-            listener.Start();
+            // Returns true if bluetooth starts listening.
+            // Returns false if bluetooth is already running.
+            if (!Running)
+            {
+                Running = true;
+                listener = new BluetoothListener(Guid.Parse("2d26618601fb47c28d9f10b8ec891363"));
+                listener.Start();
+                
 
-            listener.BeginAcceptBluetoothClient(new AsyncCallback(AcceptConnection), listener);
-            
+                listener.BeginAcceptBluetoothClient(new AsyncCallback(AcceptConnection), listener);
+
+                return true;
+            }
+            return false;
         }
 
         private void AcceptConnection(IAsyncResult result)
@@ -41,23 +51,48 @@ namespace RConsole
 
                 while (Running)
                 {
-                    int bytesReceived = stream.Read(buffer, 0, buffer.Length);
-
-                    string message = Encoding.UTF8.GetString(buffer,0,bytesReceived);
-
-                    
-
-                    if(message == "quitb")
+                    if (device.Connected)
                     {
-                        Running = false;
-                        Console.WriteLine("Bluetooth device disconnected.");
+                        try
+                        {
+                            int bytesReceived = stream.Read(buffer, 0, buffer.Length);
+
+                            string message = Encoding.UTF8.GetString(buffer, 0, bytesReceived);
+
+                            if (message != "")
+                            {
+
+
+                                if (message == "%QUITB%")
+                                {
+                                    Running = false;
+                                    Console.WriteLine("Bluetooth device disconnected.");
+                                }
+                                else
+                                {
+                                    if (message == "%PROX%")
+                                    {
+                                        console.ExecuteCommand(PROX);
+                                    }
+                                    else
+                                    {
+                                        console.ExecuteCommand(message);
+                                    }
+
+
+                                    buffer = new byte[128];
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Running = false;
+                        }
                     }
                     else
                     {
-                        console.ExecuteCommand(message);
+                        Running = false;
 
-                        
-                        buffer = new byte[128];
                     }
                 }
 
