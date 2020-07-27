@@ -188,16 +188,16 @@ namespace RConsole.Plugins
                 {
                     if (args.Length == 1)
                     {
-
-                        MoveWindowByHandle(GetForegroundWindow(), screen);
-
+                        IntPtr handle = GetForegroundWindow();
+                        MoveWindowByHandle(handle, screen);
+                        ChangeWindowView(handle, 3);
                     }
                     else
                     {
 
                         IntPtr handle = GetHandleByDesc(ArrayToString(args.Take(args.Length - 1).ToArray()));
                         MoveWindowByHandle(handle, Convert.ToInt32(args[args.Length - 1]));
-                        //ChangeWindowView(handle, 3);
+                        ChangeWindowView(handle, 3);
 
 
                     }

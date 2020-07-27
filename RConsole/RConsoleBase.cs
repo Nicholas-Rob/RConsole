@@ -1,21 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using Helper;
 
 namespace RConsole
 {
     class RConsoleBase
     {
 
-        static RConsoleBase console;
-        static CommandHandler cHandler;
-        static BluetoothManager bManager;
+        public static RConsoleBase console;
+        public static CommandHandler cHandler;
+        public static BluetoothManager bManager;
+        public static SerialCommunication serial;
         
 
         public static bool Running = false;
 
         // Command instance currently running
-        private static string instance = "base";
+        public static string instance = "base";
 
         public RConsoleBase()
         {
@@ -24,13 +25,17 @@ namespace RConsole
             cHandler = new CommandHandler();
 
             bManager = new BluetoothManager(console);
+
+            serial = new SerialCommunication(console);
+
+            
         }
 
         public void Run()
         {
             Running = true;
 
-            //bManager.Run();
+            
 
             // Main console input loop
 
@@ -83,6 +88,7 @@ namespace RConsole
 
         public static bool TryBluetooth()
         {
+            bManager.Stop();
            return bManager.Run();
         }
 

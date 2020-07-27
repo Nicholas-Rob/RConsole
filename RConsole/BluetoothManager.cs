@@ -11,13 +11,24 @@ namespace RConsole
     {
         RConsoleBase console;
         bool Running = false;
+
         BluetoothListener listener;
+        BluetoothClient device;
+        NetworkStream stream;
 
         const string PROX = "music toggle";
 
         public BluetoothManager(RConsoleBase console)
         {
             this.console = console;   
+        }
+
+        ~BluetoothManager()
+        {
+
+            if (listener != null) listener.Stop();
+            if (stream != null) stream.Close();
+            if (device != null) device.Dispose();
         }
 
         public bool Run()
@@ -38,14 +49,32 @@ namespace RConsole
             return false;
         }
 
+        public bool Stop()
+        {
+            if (Running)
+            {
+                Running = false;
+                
+                if (listener != null)
+                {
+                    
+                    stream.Close();
+                    device.Dispose();
+                }
+                
+            }
+            
+            return true;
+        }
+
         private void AcceptConnection(IAsyncResult result)
         {
             if (result.IsCompleted)
             {
                 Console.WriteLine("Bluetooth Device Connected.");
-                BluetoothClient device = ((BluetoothListener)result.AsyncState).EndAcceptBluetoothClient(result);
+                device = ((BluetoothListener)result.AsyncState).EndAcceptBluetoothClient(result);
 
-                NetworkStream stream = device.GetStream();
+                stream = device.GetStream();
 
                 byte[] buffer = new byte[128];
 
@@ -57,20 +86,20 @@ namespace RConsole
                         {
                             int bytesReceived = stream.Read(buffer, 0, buffer.Length);
 
-                            string message = Encoding.UTF8.GetString(buffer, 0, bytesReceived);
+                            string message = Encoding.UTF8.GetString(buffer, 0, bytesReceived).Trim();
 
                             if (message != "")
                             {
 
-
-                                if (message == "%QUITB%")
+                                //Console.WriteLine(message);
+                                if (message.StartsWith("%QUITB%"))
                                 {
                                     Running = false;
                                     Console.WriteLine("Bluetooth device disconnected.");
                                 }
                                 else
                                 {
-                                    if (message == "%PROX%")
+                                    if (message.StartsWith("%PROX%"))
                                     {
                                         console.ExecuteCommand(PROX);
                                     }
@@ -80,7 +109,7 @@ namespace RConsole
                                     }
 
 
-                                    buffer = new byte[128];
+                                    Array.Clear(buffer, 0, buffer.Length);
                                 }
                             }
                         }
