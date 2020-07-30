@@ -292,7 +292,7 @@ namespace RConsole.Plugins
             {
                 if (p.ProcessName.ToLower() == name.ToLower() && p.MainWindowTitle != "")
                 {
-
+                    
                     handle = p.MainWindowHandle;
                     break;
 
@@ -496,7 +496,17 @@ namespace RConsole.Plugins
         {
             try
             {
-                Process.Start(knownProgramLocations[name]);
+                ProcessStartInfo startinfo = new ProcessStartInfo(knownProgramLocations[name]);
+
+                //startinfo.RedirectStandardInput = true;
+                //startinfo.RedirectStandardOutput = true;
+
+                Process proc = new Process();
+                proc.StartInfo = startinfo;
+                proc.Start();
+                
+                //RConsoleBase.AddActiveProcess(name, proc);
+                //RConsoleBase.SwitchCurrentProcess(name);
             }
             catch (Exception e)
             {

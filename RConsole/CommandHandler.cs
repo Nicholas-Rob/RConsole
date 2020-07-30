@@ -50,6 +50,7 @@ namespace RConsole
                 if (args[0] == "quit")
                 {
                     RConsoleBase.ResetInstance();
+                    return true;
                 }
                 else
                 {
@@ -59,9 +60,12 @@ namespace RConsole
                     {
                         // Calls commands with "help" argument
                         commands[RConsoleBase.GetInstance()].Execute(new string[] { "help" });
+                        return false;
                     }
+
+                    return true;
                 }
-                return true;
+                
             }
 
 
@@ -106,6 +110,7 @@ namespace RConsole
             {
                 // Calls command with "help" argument
                 command.Execute(new string[] { "help" });
+                return false;
             }
 
             return true;
