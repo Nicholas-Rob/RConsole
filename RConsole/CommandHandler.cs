@@ -37,7 +37,7 @@ namespace RConsole
         // Handles command inputs and makes sure everything gets handled properly.
         public bool Handle(string[] args)
         {
-            
+
             // If no args, return false
             if (args.Length == 0) return false;
 
@@ -45,7 +45,7 @@ namespace RConsole
             bool result;
 
             //  Run commands for instance if current instance isn't base instance
-            if (RConsoleBase.GetInstance() != "base" )
+            if (RConsoleBase.GetInstance() != "base")
             {
                 if (args[0] == "quit")
                 {
@@ -65,7 +65,7 @@ namespace RConsole
 
                     return true;
                 }
-                
+
             }
 
 
@@ -81,7 +81,7 @@ namespace RConsole
                 // No command of name args[0]
                 return false;
             }
-            
+
             // Throwing out the command name from the input arguments
             args = args.Skip(1).ToArray();
 
@@ -99,10 +99,10 @@ namespace RConsole
                     // place holder
                     args = new string[1];
                 }
-                
-            } 
 
-            
+            }
+
+
             // finally, execute command with args in the normal fashion
             result = command.Execute(args);
 
@@ -114,7 +114,7 @@ namespace RConsole
             }
 
             return true;
-            
+
         }
 
 

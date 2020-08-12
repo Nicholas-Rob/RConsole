@@ -15,8 +15,7 @@ namespace RConsole
         public static CommandHandler cHandler;
         public static BluetoothManager bManager;
         public static SerialCommunication serial;
-
-        private Context context;
+        private static Context context;
 
         public static bool Running = false;
 
@@ -121,6 +120,12 @@ namespace RConsole
                 Console.WriteLine();
                 Console.Write(instance + "#: ");
             }
+        }
+
+
+        public static string GetCommandFromContext(int index)
+        {
+            return context.GetCommandFromContext(index);
         }
 
         public static void SetInstance(string instance)

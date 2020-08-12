@@ -12,8 +12,8 @@ namespace RConsole
     class SerialCommunication
     {
 
-        public static string COMMAND_A = "switch 1";
-        public static string COMMAND_B = "switch 2";
+        public static string COMMAND_A = "music prev";
+        public static string COMMAND_B = "music next";
 
         const string LAYOUTS = "layouts.txt";
         private static Dictionary<string, string[]> layouts;

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace Helper
@@ -99,6 +101,20 @@ namespace Helper
                     ObjStates[obj.GetType()].Add(field.Name, field.GetValue(obj));
                 }
             }
+        }
+    }
+
+    public static class JsonHelper
+    {
+        public static object ReadFile(object dummyObj, string fileName)
+        {
+            return JsonConvert.DeserializeObject<object>(File.ReadAllText(fileName));
+        }
+
+        public static void SaveFile(object dummyObj, string fileName )
+        {
+            string json = JsonConvert.SerializeObject(dummyObj);
+            File.WriteAllText(fileName, json);
         }
     }
 }
