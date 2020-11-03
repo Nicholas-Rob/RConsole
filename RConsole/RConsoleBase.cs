@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Helper;
 
@@ -37,12 +38,14 @@ namespace RConsole
         {
             console = this;
 
+            RConsoleBaseHelper.console = console;
             
             cHandler = new CommandHandler();
 
             bManager = new BluetoothManager(console);
 
             serial = new SerialCommunication(console);
+            serial.Run();
 
             context = new Context();
             
@@ -96,7 +99,7 @@ namespace RConsole
             ExecuteCommand(ArrayToString(args));
         }
 
-        public void ExecuteCommand(string commandLine)
+        public void ExecuteCommand(string commandLine, bool echo = true)
         {
             //Console.Write(commandLine);
 
@@ -117,11 +120,15 @@ namespace RConsole
                     context.AddUsedCommand(commandLine.Trim());
                 }
 
-                Console.WriteLine();
-                Console.Write(instance + "#: ");
+                if (echo)
+                {
+                    Console.WriteLine();
+                    Console.Write(instance + "#: ");
+                }
             }
         }
 
+        
 
         public static string GetCommandFromContext(int index)
         {
@@ -214,5 +221,11 @@ namespace RConsole
 
 
         }
+    }
+
+    // Made solely as a patch to this program to easily hand around references
+    static class RConsoleBaseHelper
+    {
+        public static RConsoleBase console;
     }
 }

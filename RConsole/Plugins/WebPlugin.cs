@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Helper;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -8,7 +9,7 @@ namespace RConsole.Plugins
     class WebPlugin : CommandBase
     {
 
-        [Command("web", IsInstance = true, Hide = true)]
+        [Command("web", IsInstance = false, Hide = false)]
         public static bool WebCommand(string[] args)
         {
 
@@ -21,10 +22,31 @@ namespace RConsole.Plugins
 
                 default:
 
-                    ProcessStartInfo process = new ProcessStartInfo("https://" + args[0]);
-                    Process.Start(process);
+                    var proc = new ProcessStartInfo
+                    {
+                        FileName = "https://" + args[0],
+                        UseShellExecute = true
+                    };
+                    Process.Start(proc);
                     break;
             }
+            return true;
+        }
+
+        [Command("google")]
+        public static bool GoogleSearchCommand(string[] args)
+        {
+
+            string query = args.ArrayString();
+
+            var proc = new ProcessStartInfo
+            {
+                FileName = "https://www.google.com/search?&q=" + query,
+                UseShellExecute = true
+            };
+
+            Process.Start(proc);
+
             return true;
         }
     }

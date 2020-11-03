@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 
 namespace RConsole
 {
-    class SerialCommunication
+    class SerialCommunication : IHardware
     {
 
         public static string COMMAND_A = "music prev";
@@ -25,11 +25,27 @@ namespace RConsole
 
         public SerialCommunication(RConsoleBase console)
         {
+            this.console = console;
+
+            
+
+            
+        }
+
+        ~SerialCommunication()
+        {
+            port.Close();
+
+            SaveFile();
+        }
+
+        public bool Run()
+        {
             string portName = SearchPorts();
 
             if (portName != null)
             {
-                this.console = console;
+                
 
                 port = new SerialPort(portName, 9600);
                 port.RtsEnable = true;
@@ -48,16 +64,20 @@ namespace RConsole
                 {
                     layouts = new Dictionary<string, string[]>();
                 }
+
+                return true;
+
             }
 
-            
+            return false;
         }
 
-        ~SerialCommunication()
+
+        public void Stop()
         {
             port.Close();
+            port.Dispose();
 
-            SaveFile();
         }
 
         private string SearchPorts()
@@ -86,10 +106,10 @@ namespace RConsole
             switch (data)
             {
                 case 1:
-                    console.ExecuteCommand(COMMAND_A);
+                    console.ExecuteCommand(COMMAND_A, false);
                     break;
                 case 2:
-                    console.ExecuteCommand(COMMAND_B);
+                    console.ExecuteCommand(COMMAND_B, false);
                     break;
                 default:
                     break;

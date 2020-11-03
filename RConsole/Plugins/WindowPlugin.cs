@@ -233,6 +233,7 @@ namespace RConsole.Plugins
         public static bool AppRunCommand(string[] args) {
             if (args[0] != "")
             {
+                
                 RunApp(ArrayToString(args));
             }
 
@@ -496,13 +497,29 @@ namespace RConsole.Plugins
         {
             try
             {
-                ProcessStartInfo startinfo = new ProcessStartInfo(knownProgramLocations[name]);
+                string[] nameArgs;
+
+                if (name.Contains(';'))
+                {
+                    nameArgs = name.Split(';');
+
+                }
+                else
+                {
+                    nameArgs = new string[] { name };
+                }
+                ProcessStartInfo startinfo = new ProcessStartInfo(knownProgramLocations[nameArgs[0].Trim()]);
+
+                if (nameArgs.Length > 1) {
+                    startinfo.Arguments = nameArgs[1].Trim();
+                }
 
                 //startinfo.RedirectStandardInput = true;
                 //startinfo.RedirectStandardOutput = true;
 
                 Process proc = new Process();
                 proc.StartInfo = startinfo;
+                startinfo.CreateNoWindow = true;
                 proc.Start();
                 
                 //RConsoleBase.AddActiveProcess(name, proc);

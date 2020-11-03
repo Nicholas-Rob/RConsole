@@ -7,7 +7,7 @@ using System.Text;
 
 namespace RConsole
 {
-    class BluetoothManager
+    class BluetoothManager : IHardware
     {
         RConsoleBase console;
         bool Running = false;
@@ -38,7 +38,7 @@ namespace RConsole
             if (!Running)
             {
                 Running = true;
-                listener = new BluetoothListener(Guid.Parse("2d26618601fb47c28d9f10b8ec891363"));
+                listener = new BluetoothListener(Guid.Parse("2d26618601fb47c28d9f10b8ec891363")); // Same as in the app
                 listener.Start();
                 
 
@@ -49,7 +49,7 @@ namespace RConsole
             return false;
         }
 
-        public bool Stop()
+        public void Stop()
         {
             if (Running)
             {
@@ -64,7 +64,7 @@ namespace RConsole
                 
             }
             
-            return true;
+            
         }
 
         private void AcceptConnection(IAsyncResult result)
@@ -101,11 +101,11 @@ namespace RConsole
                                 {
                                     if (message.StartsWith("%PROX%"))
                                     {
-                                        console.ExecuteCommand(PROX);
+                                        console.ExecuteCommand(PROX,false);
                                     }
                                     else
                                     {
-                                        console.ExecuteCommand(message);
+                                        console.ExecuteCommand(message,false);
                                     }
 
 

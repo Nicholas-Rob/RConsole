@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace RConsole
 {
-    // Yeah, I know that this is messy code. Fuck off. This is messy so that the rest doesn't have to be.
+    // TODO: REFACTOR
     class CommandHandler
     {
         
