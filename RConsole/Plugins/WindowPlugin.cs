@@ -260,6 +260,99 @@ namespace RConsole.Plugins
             return true;
         }
 
+        [Command("alpha")]
+        public static bool SetAlphaCommand(string[] args)
+        {
+            if (args.Length == 0)
+            {
+                return false;
+            }
+
+            // Used for "toggle" argument
+            if (args[0] == "toggle")
+            {
+
+                try
+                {
+
+                    // Window handle.
+                    IntPtr handle = IntPtr.Zero;
+
+                    // Default alpha value to toggle a window between 255 and itself.
+                    byte nAlpha = 128;
+
+                    // If window name specified, try to find the handle.
+                    if (args.Length == 2)
+                    {
+
+
+                        // If the parameter after "toggle" is not a number, accept it as the name
+                        // of a window.
+
+                        // If it is a number, then nAlpha will equal the argument, and the handle will be to the foreground window.
+                        if (!byte.TryParse(args[1], out nAlpha))
+                        {
+                            handle = GetHandleByProcessName(ArrayToString(args.Skip(1).ToArray()));
+                        }
+                        else
+                        {
+                            handle = GetForegroundWindow();
+                        }
+                        
+                        
+                    }
+                    else if(args.Length == 3)// If no name specified, try to get handle for foreground window.
+                    {
+                        handle = GetHandleByProcessName(ArrayToString(args.Skip(2).ToArray()));
+                        nAlpha = Convert.ToByte(args[1]);
+                    }
+                    else
+                    {
+                        handle = GetForegroundWindow();
+                    }
+
+                    ToggleAlpha(handle, nAlpha);
+
+                    return true;
+
+                }catch(Exception e)
+                {
+                    Console.WriteLine("Could not toggle alpha of window.");
+                    return false;
+                }
+
+            }
+            else
+            {
+
+                try
+                {
+                    byte alpha = Convert.ToByte(args[0]);
+
+
+                    IntPtr handle = IntPtr.Zero;
+
+                    if (args.Length == 2)
+                    {
+                        handle = GetHandleByProcessName(ArrayToString(args.Skip(1).ToArray()));
+                    }
+                    else
+                    {
+                        handle = GetForegroundWindow();
+                    }
+
+                    SetAlpha(handle, alpha);
+
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Could not change alpha value of window.");
+                    
+                    return false;
+                }
+            }
+        }
 
 
         [DllImport("user32.dll")]
@@ -277,6 +370,7 @@ namespace RConsole.Plugins
         [DllImport("user32.dll")]
         public static extern IntPtr TileWindows(IntPtr parent, int wHow, IntPtr rect, int kids, IntPtr lpKids);
 
+        
 
         private static bool ChangeWindowView(IntPtr handle, int state)
         {
@@ -284,6 +378,8 @@ namespace RConsole.Plugins
             return ShowWindow(handle, state);
 
         }
+
+        
 
         private static IntPtr GetHandleByProcessName(string name)
         {
@@ -529,6 +625,26 @@ namespace RConsole.Plugins
             {
 
             }
+        }
+
+
+        [DllImport("Libs\\CHelper.dll")]
+        public static extern bool SetWindowAlphaHwnd(IntPtr win, byte alpha);
+
+        // Set alpha of window chosen by handle.
+        private static bool SetAlpha(IntPtr handle, byte alpha)
+        {
+            return SetWindowAlphaHwnd(handle, alpha);
+        }
+
+
+        [DllImport("Libs\\CHelper.dll")]
+        public static extern bool ToggleWindowAlphaHwnd(IntPtr win, byte nAlpha);
+
+        // Toggle window alpha between 255 and nAlpha.
+        private static bool ToggleAlpha(IntPtr handle, byte nAlpha)
+        {
+            return ToggleWindowAlphaHwnd(handle, nAlpha);
         }
 
         private static Dictionary<string, string> ReadFile()

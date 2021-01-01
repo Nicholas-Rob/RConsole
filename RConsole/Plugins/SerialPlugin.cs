@@ -52,6 +52,7 @@ namespace RConsole.Plugins
             if(args.Length > 0)
             {
                 SerialCommunication.SetLayout(args);
+                
             }
         }
 
